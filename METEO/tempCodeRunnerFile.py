@@ -1,1 +1,1 @@
-https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=47.151726&lon=27.587914&altitude=60
+https://api.open-meteo.com/v1/ecmwf?latitude=47.151726&longitude=27.587914&hourly=temperature_2m
