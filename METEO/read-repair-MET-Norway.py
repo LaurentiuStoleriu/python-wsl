@@ -65,6 +65,16 @@ for i in range(filesNo):
         deltaTime = prognosisTime - nowTime
         diferenta = deltaTime.days*24 + deltaTime.seconds//3600
         allData.at[data['METNO'][i]['now'], diferenta] = prognosisTemp
+    lastPrognosisTime = prognosisTime
+    if ( (len(data['METNO']) < 15) ):
+        for j in range(len(data['METNO']), 39):
+            prognosisTime = lastPrognosisTime + datetime.timedelta(hours=(j-len(data['METNO']))*6)
+            prognosisTemp = 30
+            deltaTime = prognosisTime - nowTime
+            diferenta = deltaTime.days*24 + deltaTime.seconds//3600
+            allData.at[data['METNO'][i]['now'], diferenta] = prognosisTemp
+
+    
 
 allDataDiff = allData.copy()
 for index, row in allDataDiff.iterrows():
