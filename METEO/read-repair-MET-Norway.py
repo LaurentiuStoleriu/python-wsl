@@ -52,6 +52,7 @@ allData = allData.set_index('Date')
 ##################################################################### df ready
 
 for i in range(filesNo):
+#for i in range(2):
     fileTime = (datetime.datetime.strptime(firstDate, '%Y-%m-%dT%H:%M:%S') + datetime.timedelta(hours=6*i)).isoformat()
     f = open(f'/home/lali/TITAN-ROG-sync/python/METEO/MET-Norway-{fileTime}.json',)
     print(f"reading {fileTime}")
@@ -67,14 +68,13 @@ for i in range(filesNo):
         allData.at[data['METNO'][i]['now'], diferenta] = prognosisTemp
     lastPrognosisTime = prognosisTime
     if ( (len(data['METNO']) < 15) ):
-        for j in range(len(data['METNO']), 39):
-            prognosisTime = lastPrognosisTime + datetime.timedelta(hours=(j-len(data['METNO']))*6)
-            prognosisTemp = 30
+        for j in range(len(data['METNO'])+1, 39):
+            prognosisTime = lastPrognosisTime + datetime.timedelta(hours=((j-len(data['METNO']))*6))
+            prognosisTemp = 20
             deltaTime = prognosisTime - nowTime
             diferenta = deltaTime.days*24 + deltaTime.seconds//3600
-            allData.at[data['METNO'][i]['now'], diferenta] = prognosisTemp
+            allData.at[prognosisTime.strftime("%Y-%m-%dT%H:%M:%S"), diferenta] = prognosisTemp
 
-    
 
 allDataDiff = allData.copy()
 for index, row in allDataDiff.iterrows():
