@@ -1,6 +1,7 @@
 import requests
 import json
 import datetime
+import random
 import numpy as np
 import pandas as pd
 import seaborn as sb
@@ -20,7 +21,7 @@ filesNo = 1 + (timeHelper.days*24 + timeHelper.seconds//3600) // 6
 print(f"You have {filesNo} MET-Norway files")
 
 ############################################################################ read first file to build df structure
-f = open(f'/home/lali/TITAN-ROG-sync/python/METEO/MET-Norway-{firstDate}.json',)
+f = open(f'/home/lali/TITAN-ROG-sync/python/METEO/bkp/MET-Norway-{firstDate}.json',)
 data = json.load(f)
 f.close()
 
@@ -54,7 +55,7 @@ allData = allData.set_index('Date')
 for i in range(filesNo):
 #for i in range(2):
     fileTime = (datetime.datetime.strptime(firstDate, '%Y-%m-%dT%H:%M:%S') + datetime.timedelta(hours=6*i)).isoformat()
-    f = open(f'/home/lali/TITAN-ROG-sync/python/METEO/MET-Norway-{fileTime}.json',)
+    f = open(f'/home/lali/TITAN-ROG-sync/python/METEO/bkp/MET-Norway-{fileTime}.json',)
     print(f"reading {fileTime}")
     data = json.load(f)
     f.close()
@@ -70,23 +71,64 @@ for i in range(filesNo):
     if ( (len(data['METNO']) < 15) ):
         for j in range(len(data['METNO'])+1, 39):
             prognosisTime = lastPrognosisTime + datetime.timedelta(hours=((j-len(data['METNO']))*6))
-            prognosisTemp = 20
+            prognosisTemp = 50
             deltaTime = prognosisTime - nowTime
             diferenta = deltaTime.days*24 + deltaTime.seconds//3600
             allData.at[prognosisTime.strftime("%Y-%m-%dT%H:%M:%S"), diferenta] = prognosisTemp
 
+nowTime = datetime.datetime.strptime(firstDate, '%Y-%m-%dT%H:%M:%S')
+for i in range(57):
+    diferenta = 0
+    theTemp = allData.at[nowTime.strftime("%Y-%m-%dT%H:%M:%S"), diferenta]
+    for j in range(37):
+        diferenta = diferenta + 6
+        myTemp = allData.at[nowTime.strftime("%Y-%m-%dT%H:%M:%S"), diferenta]
+        theRandom = (random.random() - 0.5) / 1.0
+        if (myTemp > 45):
+            allData.at[nowTime.strftime("%Y-%m-%dT%H:%M:%S"), diferenta] = theTemp + theRandom
+        else:
+            theTemp = myTemp
+    nowTime = nowTime + datetime.timedelta(hours=6)
 
 allDataDiff = allData.copy()
 for index, row in allDataDiff.iterrows():
     for i in np.arange(0, 230, 6):
         allDataDiff.at[index, i] = allDataDiff.at[index, i] - allDataDiff.at[index, 'Real']
 
+for i in range(filesNo):
+#for i in range(2):
+    fileTime = (datetime.datetime.strptime(firstDate, '%Y-%m-%dT%H:%M:%S') + datetime.timedelta(hours=6*i)).isoformat()
+    
+    fileName = f'/home/lali/TITAN-ROG-sync/python/METEO/repair/MET-Norway-{fileTime}.json'
+    
+    currentTime = datetime.datetime.strptime(firstDate, '%Y-%m-%dT%H:%M:%S') + datetime.timedelta(hours=6*(i))
+    currentTemp = allData.at[currentTime.strftime("%Y-%m-%dT%H:%M:%S"), 'Real']
+
+    myDict = {}
+    myDict["RO"] = {"now": f"{currentTime.isoformat()}", "temp": float(currentTemp)}
+    myDict["METNO"] = []
+    for j in range(38):
+        prognosisTime = currentTime + datetime.timedelta(hours=6*j)
+        deltaTime = prognosisTime - currentTime
+        diferenta = deltaTime.days*24 + deltaTime.seconds//3600
+        prognosisTemp = round(allData.at[prognosisTime.strftime("%Y-%m-%dT%H:%M:%S"), diferenta], 1)
+        myDict["METNO"].append({"now": f"{prognosisTime.isoformat()}", "temp": prognosisTemp})
+
+    with open(fileName, "w") as outfile:
+        outfile.write(json.dumps(myDict, indent=4)) 
+
+
+
+
+
+
+
 print(allDataDiff)
 
 #allData.to_csv('/home/lali/TITAN-ROG-sync/python/METEO/MET-Norway.csv')
 #allDataDiff.to_csv('/home/lali/TITAN-ROG-sync/python/METEO/MET-Norway-diff.csv')
 
-if (True):
+if (False):
     if (False): #True pentru diferenta
         allDataDiffPlot = allDataDiff.replace(np.nan,0)
         del allDataDiffPlot['Real']
