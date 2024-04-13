@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
 
-#firstDate = '2023-07-19T21:00:00'
-firstDate = '2024-03-21T15:00:00'
-lastDate = '2024-04-12T09:00:00'
+firstDate = '2023-07-19T21:00:00'
+#firstDate = '2024-03-21T15:00:00'
+lastDate = '2024-04-13T09:00:00'
 timeHelper = (datetime.datetime.strptime(lastDate, '%Y-%m-%dT%H:%M:%S') - datetime.datetime.strptime(firstDate, '%Y-%m-%dT%H:%M:%S'))
 
 filesNo = 1 + (timeHelper.days*24 + timeHelper.seconds//3600) // 6
