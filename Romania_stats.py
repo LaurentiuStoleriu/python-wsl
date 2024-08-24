@@ -21,16 +21,16 @@ merged = merged[['province', 'geometry', 'population_2007', 'area_km2', 'municip
 # %%
 variable = 'population_2007'
 vmin, vmax = 100000, 2000000
-fig, ax = plt.subplots(1, figsize=(30, 10))
+fig, ax = plt.subplots(1, figsize=(6, 6))
 ax.axis('off')
 ax.set_title('Populatia Romaniei', fontdict={'fontsize': '25', 'fontweight' : '3'})
 
 sm = plt.cm.ScalarMappable(cmap='Blues', norm=plt.Normalize(vmin=0, vmax=vmax))# empty array for the data range
 sm.set_array([]) 
-fig.colorbar(sm)
-#fig.colorbar(sm, orientation="horizontal", fraction=0.036, pad=0.1, aspect = 30)
+#fig.colorbar(sm)
+fig.colorbar(sm, orientation="horizontal", fraction=0.036, pad=0.1, aspect = 30,ax=plt.gca())
 
 merged.plot(column=variable, cmap='Blues', linewidth=0.8, ax=ax, edgecolor='0.8')
 # %%
-
+plt.show()
 # %%
