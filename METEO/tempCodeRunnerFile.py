@@ -1,1 +1,1 @@
-https://api.open-meteo.com/v1/ecmwf?latitude=47.151726&longitude=27.587914&hourly=temperature_2m
+lastDate = '2024-09-01T03:00:00'
